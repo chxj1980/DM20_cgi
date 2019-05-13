@@ -39,6 +39,8 @@ typedef struct
     char user[16];
     char pwd[16];
     DM_SYS_INFO sys_info;
+	DM_USER_MANAGE user_manage;
+	DM_NET_SET net_set;
     long hdl_rtsp;
     long session_rawdata;
 }DM_CONFIG;
@@ -90,7 +92,7 @@ static int is_dir_exist(char *dir_path)
 {
     CHECK_RET(dir_path != NULL, ERR_INVALID_PARAM, "dir_path is NULL");
     
-    if(access(dir_path, F_OK) != 0){				//检查文件是否存在
+    if(access(dir_path, F_OK) != 0){
         printf("DIR is not exist, %02X %02X %02X %02X\r\n", 
             dir_path[0], dir_path[1], dir_path[2], dir_path[3]);
         return -1;        
@@ -107,7 +109,7 @@ static int dir_create(char *dir_path)
 {
     CHECK_RET(dir_path != NULL, ERR_INVALID_PARAM, "dir_path is NULL");
 
-    mkdir(dir_path, 0755);		//创建文件夹，并赋予权限
+    mkdir(dir_path, 0755);
 
     printf("mkdir %s\r\n", dir_path);
 
@@ -124,12 +126,12 @@ static int remove_file(char *filename)
     if(access(filename, F_OK) == 0){
         printf("%s remove [begin]\n", filename);
         
-	    if(remove(filename) != 0){		//删除一个文件
+	    if(remove(filename) != 0){
             perror("remove");
             return -1;
         }
 
-        sync();		//将缓冲区的数据写入文件磁盘中，以确保数据同步
+        sync();
         
         printf("%s remove [end]\n", filename);
 
@@ -181,7 +183,7 @@ static int meet_the_name(char *name, char *title, char *exten)
     }
 
     for(i=0; i<8; i++){
-        if(!isdigit(name[6+i])){	//判断字符是否为数字，不是数字返回0
+        if(!isdigit(name[6+i])){
             return 0;
         }
     }
@@ -370,7 +372,6 @@ static int log_file_write(char *buf, int len)
         return ERR_INVALID_PARAM;
     }
 
-	//打开日志，日期发生改变，比如过了一天，或者修改了日期，日志文件需要重新创建
     log_file_renewal();
     
     fwrite(buf, len, 1, g_log_fp);
@@ -438,7 +439,7 @@ int dm_log(int level, const char *format, ...)
             cur->tm_hour, cur->tm_min, cur->tm_sec);
 
     len = vsprintf(buf+len1, format, marker);
-    log_file_write(buf, len1+len);		//写入日志文件里
+    log_file_write(buf, len1+len);
 
     if(level <= 2){
         printf("%s", buf);
@@ -523,7 +524,7 @@ int dm_dbg_time_step(char *txt, int *sec, int *usec, int b_update)
 
 
 
-int DM_Open(long *hdl, const char *ip, int port, char *user, char *pwd)
+int DM_Open(long *hdl, const char *ip, int port, char *user, char *pwd, DM_ENABLE *en)
 {
     CHECK_RET(hdl != NULL, ERR_INVALID_PARAM, "input is NULL");
     CHECK_RET(ip != NULL, ERR_INVALID_PARAM, "input is NULL");
@@ -541,24 +542,28 @@ int DM_Open(long *hdl, const char *ip, int port, char *user, char *pwd)
     config.port = port;
     strcpy(config.ip, ip);
     strcpy(config.user, user);
-    strcpy(config.pwd, pwd);	//password
+    strcpy(config.pwd, pwd);
 
-	//获取系统信息:存入config.sys_info中
+	//sys_info
     ret = DM_Get_Sys_Info((long)&config, &config.sys_info);
     CHECK_RET(ret == DM_SUCCESS, ret, "DM_Get_Sys_Info failed");
 
     dm_log(5, "Sys Info: output=%d, ir_w=%d, ir_h=%d, dev_ver=%s\r\n", 
         config.sys_info.output, config.sys_info.ir_w, config.sys_info.ir_h, config.sys_info.dev_version);
+	//user_info
+	ret=DM_Get_User_info((long)&config, &config.user_manage, en);
+	CHECK_RET(ret == DM_SUCCESS, ret, "DM_Get_User_Info failed");
+	//net_set
+	ret=DM_Get_Net_info((long)&config, &config.net_set, en);
+	CHECK_RET(ret == DM_SUCCESS, ret, "DM_Get_Net_Info failed");
 
-	//创建CRtsp对象，将数据传入config.hdl_rtsp中
+	//
     ret = rtsp_session_create(&config.hdl_rtsp);
     CHECK_RET(ret == DM_SUCCESS, ret, "rtsp_session_create failed");
 
-	//开辟rawdata_session空间,将数据传入config.session_rawdata中
     ret = rawdata_session_create(&config.session_rawdata);
     CHECK_RET(ret == DM_SUCCESS, ret, "rawdata_session_create failed");
 
-	//将config的数据复制到l_hdl
 	l_hdl = handle_call(&config, sizeof(DM_CONFIG));
     if(l_hdl == ERR_NO_MEMORY){
         return ERR_NO_MEMORY;
@@ -596,10 +601,10 @@ int DM_Close(long hdl)
 int DM_Version(DM_VERSION *version)
 {
     CHECK_RET(version != NULL, ERR_INVALID_PARAM, "input is NULL");
-	//"版本发布时间"
+
     sprintf(version->version, "V1.02.00, Build Time[%s, %s] Release\n", __DATE__, __TIME__);
-	//写入日志文件中
-    dm_log(3, "%s, success\r\n", __FUNCTION__);		
+
+    dm_log(3, "%s, success\r\n", __FUNCTION__);
     
     return DM_SUCCESS;
 }

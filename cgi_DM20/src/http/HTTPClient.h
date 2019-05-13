@@ -216,7 +216,7 @@ extern "C" {
     typedef struct _HTTP_REQUEST
     {
 
-        HTTP_URL            HttpUrl;	//URL时统一泽园定位符，描述了一台特定服务器上某资源的特定位置
+        HTTP_URL            HttpUrl;
         HTTP_HEADERS        HttpHeaders;
         HTTP_HEADERS_INFO   HttpHeadersInfo;
         HTTP_AUTH_HEADER    HttpAuthHeader;

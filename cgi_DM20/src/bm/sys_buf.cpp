@@ -28,11 +28,10 @@ PPSN_CTX * net_buf_fl = NULL;
 /***************************************************************************************/
 ONVIF_API BOOL net_buf_fl_init()
 {
-	net_buf_fl = pps_ctx_fl_init(200,2048,TRUE);	//创建并初始化链表
+	net_buf_fl = pps_ctx_fl_init(200,2048,TRUE);
 	if (net_buf_fl == NULL)
 		return FALSE;
 
-	//写入日志文件中
 	log_print(LOG_INFO, "net_buf_fl_init::num = %lu\r\n",net_buf_fl->node_num);
 
 	return TRUE;

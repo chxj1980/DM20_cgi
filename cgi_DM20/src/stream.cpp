@@ -20,7 +20,7 @@ int rtsp_session_create(long *hdl)
 {
 	CHECK_RET(hdl != NULL, ERR_INVALID_PARAM, "rtsp_session, input is NULL");
 
-	CRtsp *p_rtsp = new CRtsp;		//创建CRtsp对象指针
+	CRtsp *p_rtsp = new CRtsp;
 	CHECK_RET(p_rtsp != NULL, -1, "rtsp_session, new failed");
 
 	*hdl = (long)p_rtsp;
@@ -83,16 +83,16 @@ int DM_Video_Stream_Start(long hdl, int port)
 	const char * password = NULL;
 	CRtsp *p_rtsp;
 
-	ret = dm_rtsp_config_get(hdl, ip, &hdl_rtsp);	//获取config的数据，赋值给hdl_rtsp
+	ret = dm_rtsp_config_get(hdl, ip, &hdl_rtsp);
 	CHECK_RET(ret == DM_SUCCESS, ERR_INVALID_HANDLE, "invalid handle");
 
 	p_rtsp = (CRtsp *)hdl_rtsp;
 
-	ret = p_rtsp->rtsp_start(filename, ip, port, username, password);	//获取视频流
+	ret = p_rtsp->rtsp_start(filename, ip, port, username, password);
 	CHECK_RET(ret != FALSE, ERR_SOCKET_CONNECT, "rtsp_start failed");
 
 	p_rtsp->rtsp_play();
-	printf("111111111111111\n");
+
 	return DM_SUCCESS;
 }
 
@@ -128,7 +128,7 @@ int DM_Video_Stream_Register(long hdl, VIDEO_NOTIFY_CB notify_cb, VIDEO_STREAM_C
 
 	p_rtsp = (CRtsp *)hdl_rtsp;
 	p_rtsp->set_notify_cb(notify_cb, (void*)hdl);
-	p_rtsp->set_video_cb(video_cb);		//获取视频流
+	p_rtsp->set_video_cb(video_cb);
 
 	return DM_SUCCESS;
 }
@@ -139,7 +139,7 @@ typedef struct
 {
 	HTTP_SESSION_HANDLE pHTTP;
 	INFRARED_NOTIFY_CB notify_callback;
-	INFRARED_DATA_CB data_callback;	//获取Infrared视频流的回调函数
+	INFRARED_DATA_CB data_callback;
 	int is_infrared_thread_running;
 	pthread_t infrared_thread_id;
 	unsigned char temp_param[RAW_TEPM_PARAM_SIZE];
@@ -482,7 +482,6 @@ int DM_Infrared_Stream_Start(long hdl, int port, int framerate)
 
     p_raw_session->is_infrared_thread_running = TRUE;
 
-	//该线程调用回调函数获取Infrared视频流
 	ret = pthread_create(&(p_raw_session->infrared_thread_id), NULL, (void *(*)(void *))infrared_rx_thread, (void *)hdl);
 	if (ret != 0){
         printf("%s, pthread_create failed, ret=%d\r\n", __FUNCTION__, ret);
@@ -512,7 +511,6 @@ int DM_Infrared_Stream_Stop(long hdl)
 
 	notify_callback(hdl, STREAM_EVE_STOPPED, p_raw_session->arg);
 
-	printf("Infrared Stream stop!!!\n");
 	return DM_SUCCESS;
 }
 
@@ -529,7 +527,7 @@ int DM_Infrared_Stream_Register(long hdl, INFRARED_NOTIFY_CB notify_cb, INFRARED
 	p_raw_session = (RAW_DATA_SESSION *)raw_session;
 
 	p_raw_session->notify_callback = notify_cb;
-	p_raw_session->data_callback = data_cb;	//获取Infrared视频流
+	p_raw_session->data_callback = data_cb;
 	p_raw_session->arg = arg;
 
 	return DM_SUCCESS;

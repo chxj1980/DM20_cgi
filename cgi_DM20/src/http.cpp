@@ -224,41 +224,40 @@ int http_get(long hdl, char *cmd, char *subcmd, DM_DICTS *dicts)
 {
     INT32 nRetCode;
     HTTP_SESSION_HANDLE pHTTP;
-    char uri[128];		//URI是统一资源标识符，每个web服务器都有一个URI标识符
+    char uri[128];
 
-	//检查hdl的有效性
+
     CHECK_RET(handle_valid(hdl) == DM_SUCCESS, ERR_INVALID_HANDLE, "invalid handle");
     
     memset(uri, 0x00, sizeof(uri));
     
-    http_uri_fill(hdl, cmd, subcmd, uri);		//组合地址:赋值给uri
+    http_uri_fill(hdl, cmd, subcmd, uri);
 
-    pHTTP = HTTPClientOpenRequest(0);			//分配内存给http session
+    pHTTP = HTTPClientOpenRequest(0);
     
 #ifdef _HTTP_DEBUGGING_
     HTTPClientSetDebugHook(pHTTP, &HTTPDebug);
 #endif
 
-    nRetCode = HTTPClientSetVerb(pHTTP, VerbGet);	//设置http向外请求的动词，动词包括:GET,POST,PUT,PATCH,DELETE
+    nRetCode = HTTPClientSetVerb(pHTTP, VerbGet);
     if(nRetCode != HTTP_CLIENT_SUCCESS){
         dm_log(2, "%s, HTTPClientSetVerb failed\r\n", __FUNCTION__);
         return nRetCode;
     }
 
-	//添加向外请求的头
     nRetCode = HTTPClientAddRequestHeaders(pHTTP, "Cookie", "Name=admin; Pass=Admin123; Type=Admin", 0);
     if(nRetCode != HTTP_CLIENT_SUCCESS){
         dm_log(2, "%s, HTTPClientAddRequestHeaders failed\r\n", __FUNCTION__);
         return nRetCode;
     }
-    //发送请求
+    
     nRetCode = HTTPClientSendRequest(pHTTP, uri, NULL, 0, FALSE, 0, 0);
     if(nRetCode != HTTP_CLIENT_SUCCESS){
         dm_log(2, "%s, HTTPClientSendRequest failed\r\n", __FUNCTION__);
         return nRetCode;
     }
 
-    // 检索标题并分析他们
+    // Retrieve the the headers and analyze them
     nRetCode = HTTPClientRecvResponse(pHTTP, 3);
     if(nRetCode != HTTP_CLIENT_SUCCESS){
         dm_log(2, "%s, HTTPClientRecvResponse failed\r\n", __FUNCTION__);
@@ -270,7 +269,7 @@ int http_get(long hdl, char *cmd, char *subcmd, DM_DICTS *dicts)
 
     memset(g_buf_rx, 0x00, sizeof(g_buf_rx));
     
-    // 获取数据，直到我们得到一个错误或流代码已经结束
+    // Get the data until we get an error or end of stream code
     while(nRetCode == HTTP_CLIENT_SUCCESS || nRetCode != HTTP_CLIENT_EOS)
     {
         // Set the size of our buffer
@@ -283,10 +282,10 @@ int http_get(long hdl, char *cmd, char *subcmd, DM_DICTS *dicts)
 
     HTTPClientCloseRequest(&pHTTP);
 
-    decode_string(g_buf_rx);    //解码
+    decode_string(g_buf_rx);    
     dm_log(4, "%s, total=%d, RSP: %s\r\n", __FUNCTION__, (int)total, g_buf_rx);
 
-    prase_dicts(g_buf_rx, '&', '=', dicts);	//解析字符串
+    prase_dicts(g_buf_rx, '&', '=', dicts);
     
     return DM_SUCCESS;
 }

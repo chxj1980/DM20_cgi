@@ -48,7 +48,7 @@ ONVIF_API void * sys_os_create_mutex()
 	int ret;
 
 	p_mutex = (sem_t *)malloc(sizeof(sem_t));
-	ret = sem_init((sem_t *)p_mutex,0,1);	//初始化信号量
+	ret = sem_init((sem_t *)p_mutex,0,1);
 	if (ret != 0)
 	{
 		free(p_mutex);
@@ -127,7 +127,7 @@ ONVIF_API int sys_os_mutex_enter(void * p_sem)
 		return -1;
 
 #if	(__VXWORKS_OS__ || __LINUX_OS__)
-	ret = sem_wait((sem_t *)p_sem);		//信号量的值减1
+	ret = sem_wait((sem_t *)p_sem);
 	if (ret != 0)
 		return -1;
 		
@@ -149,7 +149,7 @@ ONVIF_API void sys_os_mutex_leave(void * p_sem)
 
 #if	(__VXWORKS_OS__ || __LINUX_OS__)
 
-	sem_post((sem_t *)p_sem);	//信号量的值加1
+	sem_post((sem_t *)p_sem);
 	
 #elif __WIN32_OS__
 

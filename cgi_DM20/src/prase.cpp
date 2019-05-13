@@ -75,10 +75,10 @@ int prase_dicts(char *buf, char para_delimiter, char val_delimiter, DM_DICTS *di
     
 
     dicts->count = 0;
-    ptr = buf;			//
+    ptr = buf;
     
     while(*ptr != 0){
-        dict = &dicts->dict[dicts->count];		//
+        dict = &dicts->dict[dicts->count];
         
         ptr = get_name_value(ptr, dict->key, dict->value, para_delimiter, val_delimiter);
         

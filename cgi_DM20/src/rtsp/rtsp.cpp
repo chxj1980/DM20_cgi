@@ -544,7 +544,7 @@ int CRtsp::rtsp_client_state(RUA * p_rua, HRTSP_MSG * rx_msg)
 
 			if (m_VideoCodec == VideoCodec_H264)
 			{
-				rtsp_send_sps_pps_para(p_rua);	//获取视频流
+				rtsp_send_sps_pps_para(p_rua);
 			}	
 			else if (m_VideoCodec == VideoCodec_MPEG4)
 			{
@@ -552,7 +552,7 @@ int CRtsp::rtsp_client_state(RUA * p_rua, HRTSP_MSG * rx_msg)
 			}
 			else if (m_VideoCodec == VideoCodec_H265)
 			{
-				rtsp_send_vps_sps_pps_para(p_rua);	//获取视频流1
+				rtsp_send_vps_sps_pps_para(p_rua);
 			}
 		}
 		else
@@ -708,7 +708,7 @@ int CRtsp::rtsp_msg_parser(RUA * p_rua)
 	else
 		p_rua->rcv_dlen = 0;
 
-	rtsp_client_state(p_rua, rx_msg);	//获取视频流
+	rtsp_client_state(p_rua, rx_msg);
 	free_rtsp_msg(rx_msg);
 
 	return RTSP_PARSE_SUCC;
@@ -776,7 +776,7 @@ rx_point:
 
 	if (is_rtsp_msg(p_rua->rcv_buf))	//Is RTSP Packet?
 	{
-		int ret = rtsp_msg_parser(p_rua);	//获取视频流
+		int ret = rtsp_msg_parser(p_rua);
 		if (ret == RTSP_PARSE_FAIL)
 		{
 			return RTSP_RX_FAIL;
@@ -872,7 +872,6 @@ BOOL CRtsp::rtsp_start(char* url, char* ip, int port, const char * user, const c
 	m_nport = port;
 
     m_bRunning = TRUE;
-	//获取视频流的线程
 	m_rtspRxTid = sys_os_create_thread((void *)rtsp_rx_thread, this);
 	if (m_rtspRxTid == 0)
 	{
@@ -1593,7 +1592,7 @@ void CRtsp::rx_thread()
     
 	while (m_bRunning)
 	{
-	    ret = rtsp_tcp_rx();	//获取视频流
+	    ret = rtsp_tcp_rx();
 	    if (ret == RTSP_RX_FAIL)
 	    {
 	        break;
@@ -1867,7 +1866,7 @@ void CRtsp::set_notify_cb(notify_cb notify, void * userdata)
 void CRtsp::set_video_cb(video_cb cb) 
 {
 	sys_os_mutex_enter(m_pMutex);
-	m_pVideoCB = cb;		//获取视频流的回调函数
+	m_pVideoCB = cb;
 	sys_os_mutex_leave(m_pMutex);
 }
 

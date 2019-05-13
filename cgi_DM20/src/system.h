@@ -1,6 +1,8 @@
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
+#define RESV_LEN    64
+
 typedef struct
 {
     char dev_version[64];
@@ -13,6 +15,74 @@ typedef struct
     int resv[RESV_LEN];
 }DM_SYS_INFO;
 
+typedef struct
+{
+	char user_info[128];
+	char ret_login[32];
+	int resv[RESV_LEN];
+}DM_USER_MANAGE;
+
+typedef struct
+{
+	char ip_addr[16];
+	char netmask[16];
+	char gateway[16];
+	char mac_addr[32];
+	char dns[16];
+	char dns2[16];
+	char dhcp[4];
+	int http_port;
+	int rtsp_port;
+}DM_TCP_IP;
+
+typedef struct
+{
+	char enable[4];
+	char server_ip[16];
+	int port;
+	char user_name[16];
+	char password[32];
+	char store_dir[32];
+}DM_FTP;
+
+typedef struct
+{
+	char enable[4];
+	char addr[16];
+	int port;
+	char fromaddr[16];
+	char username[8];
+	char password[16];
+	char receiptaddr1[16];
+	char receiptaddr2[16];
+	char receiptaddr3[16];
+	char receiptaddr4[16];
+}DM_MAIL;
+
+typedef struct
+{
+	char enable[4];
+	char id_server[32];
+	char domain_server[16];
+	char ip_server[16];
+	int port_server;
+	char auth_id[32];
+	char password[16];
+	int port_local;
+	int expires;
+	int hbtime;
+	int hbcount;
+	char rstatus[4];
+	char video_id[32];
+}DM_GB;
+
+typedef struct
+{
+	DM_TCP_IP tcp_ip;
+	DM_FTP ftp_d;
+	DM_MAIL mail_d;
+	DM_GB gb_d;
+}DM_NET_SET;
 
 typedef struct
 {
@@ -153,6 +223,8 @@ typedef struct
 
 
 int DM_Get_Sys_Info(long hdl, DM_SYS_INFO *info);
+int DM_Get_User_info(long hdl, DM_USER_MANAGE *info, DM_ENABLE *en);
+int DM_Get_Net_info(long hdl, DM_NET_SET *info, DM_ENABLE *en);
 int DM_Get_Alarm_Info(long hdl, DM_ALARM_INFO *info);
 int DM_Get_Temp_Info(long hdl, DM_TEMP_INFO *info);
 int DM_Set_Osd_Cam(long hdl, DM_OSD_CAM *osd);

@@ -86,7 +86,7 @@ ONVIF_API PPSN_CTX * pps_ctx_fl_init(unsigned long node_num,unsigned long conten
 		log_print(LOG_ERR, "pps_ctx_fl_init::memory malloc failed,len = %d\r\n", content_len);
 		return NULL;
 	}
-	//≥ı ºªØ¡¥±Ì
+
 	ctx_ptr = pps_ctx_fl_init_assign(
 		content_ptr,content_len+sizeof(PPSN_CTX),
 		node_num,content_size,bNeedMutex);

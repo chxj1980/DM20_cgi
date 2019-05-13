@@ -107,7 +107,7 @@ int _log_print(int level, const char *fmt, va_list argptr)
 		g_log_level_str[level]);
 	
 	slen = vfprintf(g_pLogFile,fmt,argptr);
-	fflush(g_pLogFile);	//刷新缓冲区，将缓冲区的数据写入到日志文件中
+	fflush(g_pLogFile);
 
 	sys_os_mutex_leave(g_pLogMutex);
 

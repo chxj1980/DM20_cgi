@@ -32,10 +32,8 @@
 
 #ifdef WIN32
 	#ifdef ONVIF_EXPORTS
-	//从dll中导出函数、数据、对象。将函数声明成dllexport就可以免去定义模块定义(.DEF)文件
 		#define ONVIF_API __declspec(dllexport)
 	#else
-	//从dll中导入函数、数据、对象。加__declspec(dllimport)的函数，少了一个跳转指令的执行
 		#define ONVIF_API __declspec(dllimport)
 	#endif
 	

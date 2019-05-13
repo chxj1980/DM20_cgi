@@ -63,10 +63,17 @@ typedef enum
 
 typedef struct
 {
-    char version[64];		//°æ±¾
+    char version[64];
     int resv[RESV_LEN];
 }DM_VERSION;
 
+typedef struct
+{
+	int enable_login;
+	int enable_add;
+	int enable_del;
+	int enable_chpass;
+}DM_ENABLE;
 
 #define LOG_LEVEL_DEFAULT   3
 #define MAX_LOG_LEVEL       8
@@ -98,7 +105,7 @@ typedef struct
 ** user: the device user, always "admin"
 **  pwd: the user's passwd, you should know it
 **/
-int DM_Open(long *hdl, const char *ip, int port, char *user, char *pwd);
+int DM_Open(long *hdl, const char *ip, int port, char *user, char *pwd, DM_ENABLE *en);
 
 
 /* close a server

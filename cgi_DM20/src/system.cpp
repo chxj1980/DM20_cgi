@@ -211,9 +211,9 @@ static int get_sys_info1(long hdl, DM_SYS_INFO *info)
     CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
     
     for(i=0; i<dicts.count; i++){
-        if(strcmp(dicts.dict[i].key, "DM6xResolution") == 0){		//分辨率
+        if(strcmp(dicts.dict[i].key, "DM6xResolution") == 0){
             sscanf(dicts.dict[i].value, "%d*%d", &info->ir_w, &info->ir_h);
-        }else if(strcmp(dicts.dict[i].key, "SystemVersion") == 0){	//系统版本
+        }else if(strcmp(dicts.dict[i].key, "SystemVersion") == 0){
             strcpy(info->dev_version, dicts.dict[i].value);
         }else{
             dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
@@ -236,7 +236,7 @@ static int get_sys_info2(long hdl, DM_SYS_INFO *info)
     CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
     
     for(i=0; i<dicts.count; i++){
-        if(strcmp(dicts.dict[i].key, "Output") == 0){		//视频制式:PAL或NTSC
+        if(strcmp(dicts.dict[i].key, "Output") == 0){
             info->output = atoi(dicts.dict[i].value);
         }else{
             dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
@@ -276,9 +276,291 @@ static int get_sys_info3(long hdl, DM_SYS_INFO *info)
     
     return DM_SUCCESS;
 }
+/********************************************************************************/
+static int get_user_info1(long hdl, DM_USER_MANAGE *info)
+{
+	int i,ret;
+    DM_DICTS dicts;
 
+	ret = http_get(hdl, "user", "Operation=Query", &dicts);
+    CHECK_RET(ret == DM_SUCCESS, ret, "GET Query failed");
 
+    CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
 
+	strcat(info->user_info, "Name=");
+	for(i=0; i<dicts.count; i++){  
+        strcat(info->user_info, dicts.dict[i].value);
+		if(i == dicts.count - 1)
+			break;
+
+		strcat(info->user_info, "    Type=");
+        dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+    }
+
+    return DM_SUCCESS;
+}
+
+static int get_user_info2(long hdl, DM_USER_MANAGE *info)
+{
+	int i,ret;
+	char b[128],c[20],d[20];
+    DM_DICTS dicts;
+
+	printf("Name=");
+	scanf("%s",c);
+	printf("Pass=");
+	scanf("%s",d);
+
+	sprintf(b,"Operation=Login&Name=%s&Pass=%s",c,d);
+	ret = http_get(hdl, "user", b, &dicts);
+    CHECK_RET(ret == DM_SUCCESS, ret, "GET Login failed");
+
+    CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+ 
+	strcat(info->ret_login, "Type=");
+    strcat(info->ret_login, dicts.dict[0].value);
+	strcat(info->ret_login, "   Version=");
+	strcat(info->ret_login, dicts.dict[1].value);
+		
+    dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+
+	return DM_SUCCESS;
+}
+
+static int get_user_info3(long hdl, DM_USER_MANAGE *info)
+{
+	int i,ret;
+	char b[128],c[20],d[20],e[6];
+    DM_DICTS dicts;
+
+	printf("Name=");
+	scanf("%s",c);
+	printf("Pass=");
+	scanf("%s",d);
+	printf("(Admin or User)Type=");
+	scanf("%s",e);
+
+	sprintf(b,"Operation=Add&Name=%s&Pass=%s&Type=%s",c,d,e);
+	ret = http_get(hdl, "user", b, &dicts);
+    CHECK_RET(ret == DM_SUCCESS, ret, "GET Add User failed");
+
+    CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+		
+    dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+
+	return DM_SUCCESS;
+}
+
+static int get_user_info4(long hdl, DM_USER_MANAGE *info)
+{
+	int i,ret;
+	char b[128],c[20];
+	DM_DICTS dicts;
+	
+	printf("Name=");
+	scanf("%s",c);
+	
+	sprintf(b,"Operation=Del&Name=%s",c);
+	ret = http_get(hdl, "user", b, &dicts);
+	CHECK_RET(ret == DM_SUCCESS, ret, "GET Delete User failed");
+	
+	CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+			
+	dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+	
+	return DM_SUCCESS;
+}
+
+static int get_user_info5(long hdl, DM_USER_MANAGE *info)
+{
+	int i,ret;
+	char b[256],c[20],d[20],e[20];
+    DM_DICTS dicts;
+	//admin login
+	ret = http_get(hdl, "user", "Operation=Login&Name=admin&Pass=Admin123", &dicts);
+	CHECK_RET(ret == DM_SUCCESS, ret, "GET Login failed");
+	
+	CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+
+	printf("Name=");
+	scanf("%s",c);
+	printf("Pass=");
+	scanf("%s",d);
+	printf("NewPass=");
+	scanf("%s",e);
+
+	sprintf(b,"Operation=ChgPass&Name=%s&Pass=%s&NewPass=%s&Type=Admin",c,d,e);
+	ret = http_post(hdl, "user", b, &dicts);
+    CHECK_RET(ret == DM_SUCCESS, ret, "GET change password failed");
+
+    CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+		
+    dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+
+	return DM_SUCCESS;
+}
+
+static int get_net_info1(long hdl, DM_NET_SET *info)
+{
+	int i, ret;
+    DM_DICTS dicts;
+
+    CHECK_RET(info != NULL, ERR_INVALID_PARAM, "input is NULL");
+
+    ret = http_get(hdl, "system", "Module=Network", &dicts);
+    CHECK_RET(ret == 0, ret, "GET tcp/ip failed");
+
+    CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+    
+    for(i=0; i<dicts.count; i++){
+        if(strcmp(dicts.dict[i].key, "IPAddr") == 0){
+            strcpy(info->tcp_ip.ip_addr, dicts.dict[i].value);
+        }else if(strcmp(dicts.dict[i].key, "Netmask") == 0){
+            strcpy(info->tcp_ip.netmask, dicts.dict[i].value);
+        }else if(strcmp(dicts.dict[i].key, "Gateway") == 0){
+        	strcpy(info->tcp_ip.gateway, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "MACAddr") == 0){
+        	strcpy(info->tcp_ip.mac_addr, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "DNS") == 0){
+        	strcpy(info->tcp_ip.dns, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "DNS2") == 0){
+        	strcpy(info->tcp_ip.dns2, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "DHCP") == 0){
+        	strcpy(info->tcp_ip.dhcp, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "HttpPort") == 0){
+        	info->tcp_ip.http_port = atoi(dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "RtspPort") == 0){
+        	info->tcp_ip.rtsp_port = atoi(dicts.dict[i].value);
+		}else{
+            dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+        }
+    }
+
+    return DM_SUCCESS;
+}
+
+static int get_net_info2(long hdl, DM_NET_SET *info)
+{
+	int i, ret;
+    DM_DICTS dicts;
+
+    CHECK_RET(info != NULL, ERR_INVALID_PARAM, "input is NULL");
+
+    ret = http_get(hdl, "system", "Module=FTP", &dicts);
+    CHECK_RET(ret == 0, ret, "GET tcp/ip failed");
+
+    CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+    
+    for(i=0; i<dicts.count; i++){
+        if(strcmp(dicts.dict[i].key, "FtpEnable") == 0){
+            strcpy(info->ftp_d.enable, dicts.dict[i].value);
+        }else if(strcmp(dicts.dict[i].key, "FtpServer") == 0){
+            strcpy(info->ftp_d.server_ip, dicts.dict[i].value);
+        }else if(strcmp(dicts.dict[i].key, "FtpPort") == 0){
+        	info->ftp_d.port = atoi(dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "UserName") == 0){
+        	strcpy(info->ftp_d.user_name, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "Password") == 0){
+        	strcpy(info->ftp_d.password, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "StoreDirectory") == 0){
+        	strcpy(info->ftp_d.store_dir, dicts.dict[i].value);
+		}else{
+            dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+        }
+    }
+
+    return DM_SUCCESS;
+}
+
+static int get_net_info3(long hdl, DM_NET_SET *info)
+{
+	int i, ret;
+    DM_DICTS dicts;
+
+    CHECK_RET(info != NULL, ERR_INVALID_PARAM, "input is NULL");
+
+    ret = http_get(hdl, "system", "Module=SMTP", &dicts);
+    CHECK_RET(ret == 0, ret, "GET mail failed");
+
+    CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+
+	for(i=0; i<dicts.count; i++){
+        if(strcmp(dicts.dict[i].key, "SmtpEnable") == 0){
+            strcpy(info->mail_d.enable, dicts.dict[i].value);
+        }else if(strcmp(dicts.dict[i].key, "SmtpServer") == 0){
+            strcpy(info->mail_d.addr, dicts.dict[i].value);
+        }else if(strcmp(dicts.dict[i].key, "SmtpPort") == 0){
+        	info->mail_d.port = atoi(dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "UserName") == 0){
+        	strcpy(info->mail_d.username, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "Password") == 0){
+        	strcpy(info->mail_d.password, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "FromAddr") == 0){
+        	strcpy(info->mail_d.fromaddr, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "ReceiptAddr1") == 0){
+        	strcpy(info->mail_d.receiptaddr1, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "ReceiptAddr2") == 0){
+        	strcpy(info->mail_d.receiptaddr2, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "ReceiptAddr3") == 0){
+        	strcpy(info->mail_d.receiptaddr3, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "ReceiptAddr4") == 0){
+        	strcpy(info->mail_d.receiptaddr4, dicts.dict[i].value);
+		}else{
+            dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+        }
+	}
+
+    return DM_SUCCESS;
+}
+
+static int get_net_info4(long hdl, DM_NET_SET *info)
+{
+	int i, ret;
+    DM_DICTS dicts;
+
+    CHECK_RET(info != NULL, ERR_INVALID_PARAM, "input is NULL");
+
+    ret = http_get(hdl, "system", "Module=gb28181", &dicts);
+    CHECK_RET(ret == 0, ret, "GET GB28181 failed");
+
+    CHECK_RET(dicts.count > 0, ERR_NOT_SUPPORT, "rsp is wrong");
+
+	for(i=0; i<dicts.count; i++){
+        if(strcmp(dicts.dict[i].key, "Enable") == 0){
+            strcpy(info->gb_d.enable, dicts.dict[i].value);
+        }else if(strcmp(dicts.dict[i].key, "ServerID") == 0){
+            strcpy(info->gb_d.id_server, dicts.dict[i].value);
+        }else if(strcmp(dicts.dict[i].key, "ServerDomain") == 0){
+        	strcpy(info->gb_d.domain_server, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "ServerIP") == 0){
+        	strcpy(info->gb_d.ip_server, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "ServerPort") == 0){
+        	info->gb_d.port_server = atoi(dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "AuthID") == 0){
+        	strcpy(info->gb_d.auth_id, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "Password") == 0){
+        	strcpy(info->gb_d.password, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "LocalPort") == 0){
+        	info->gb_d.port_local = atoi(dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "Expires") == 0){
+        	info->gb_d.expires = atoi(dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "HeartBeatTime") == 0){
+        	info->gb_d.hbtime = atoi(dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "HeartBeatCount") == 0){
+        	info->gb_d.hbcount = atoi(dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "RegisterStatus") == 0){
+        	strcpy(info->gb_d.rstatus, dicts.dict[i].value);
+		}else if(strcmp(dicts.dict[i].key, "VideoID") == 0){
+        	strcpy(info->gb_d.video_id, dicts.dict[i].value);
+		}else{
+            dm_log(5, "%s, key=%s not match\n", __FUNCTION__, dicts.dict[i].key);
+        }
+	}
+
+    return DM_SUCCESS;
+}
+
+/********************************************************************************/
 static int fill_alarm_info(long hdl, DM_ALARM_INFO *info_alarm)
 {
     CHECK_RET(info_alarm != NULL, ERR_INVALID_PARAM, "input is NULL");
@@ -357,7 +639,55 @@ int DM_Get_Sys_Info(long hdl, DM_SYS_INFO *info)
     return DM_SUCCESS;
 }
 
+int DM_Get_User_info(long hdl, DM_USER_MANAGE *info, DM_ENABLE *en)
+{
+	dm_log(3, "%s, <In>\r\n", __FUNCTION__);
+    
+    CHECK_RET(info != NULL, ERR_INVALID_PARAM, "input is NULL");
 
+    memset((char*)info, 0x00, sizeof(DM_USER_MANAGE));
+	
+	get_user_info1(hdl, info);		//user_query
+	if(en->enable_login == 1)
+	{
+		get_user_info2(hdl, info);			//user_login
+	}
+	if(en->enable_add == 1)
+	{
+		get_user_info3(hdl, info);			//user_add
+	}
+	if(en->enable_del == 1)
+	{
+		get_user_info4(hdl, info);			//user_del
+	}
+	if(en->enable_chpass == 1)
+	{
+		get_user_info5(hdl, info);			//user_chpass
+	}
+	
+	dm_log(3, "%s, success\r\n", __FUNCTION__);
+    
+    return DM_SUCCESS;
+}
+
+int DM_Get_Net_info(long hdl, DM_NET_SET *info, DM_ENABLE *en)
+{
+	dm_log(3, "%s, <In>\r\n", __FUNCTION__);
+    
+    CHECK_RET(info != NULL, ERR_INVALID_PARAM, "input is NULL");
+
+    memset((char*)info, 0x00, sizeof(DM_NET_SET));
+
+	get_net_info1(hdl, info);		//tcp/ip
+	get_net_info2(hdl, info);		//ftp
+	get_net_info3(hdl,info);		//mail
+	get_net_info4(hdl,info);		//gb28181
+
+	
+	dm_log(3, "%s, success\r\n", __FUNCTION__);
+    
+    return DM_SUCCESS;
+}
 
 int DM_Set_Osd_Cam(long hdl, DM_OSD_CAM *osd)
 {
