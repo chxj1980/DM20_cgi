@@ -1,0 +1,23 @@
+---- m_pVideoCB Matches (22 in 2 files) ----
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):	m_pVideoCB = 0;
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):	if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):		m_pVideoCB(sps_pps, len+4, 0, 0, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):			if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):				m_pVideoCB(sps_pps, len+4, 0, 0, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):		if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):			m_pVideoCB(buff, len+4, 0, 0, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):		if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):			m_pVideoCB(buff, len+4, 0, 0, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):		if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):			m_pVideoCB(buff, len+4, 0, 0, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):	m_pVideoCB = NULL;
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):		if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):	        m_pVideoCB(m_fu_buf, m_jpeg_offset, ts, seq, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):		if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):			m_pVideoCB(m_fu_buf, m_h264_offset+4, ts, seq, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):		if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):			m_pVideoCB(m_fu_buf, m_h265_offset+4, ts, seq, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):		if (m_pVideoCB)
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):			m_pVideoCB(m_fu_buf, m_mpeg4_offset+m_mpeg4_header_len, ts, seq, m_pUserdata);
+Rtsp.cpp (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):	m_pVideoCB = cb;		//ªÒ»° ”∆µ¡˜µƒªÿµ˜∫Ø ˝
+Rtsp.h (e:\ypp\≤‚ ‘\cgi_dm20\src\rtsp):	video_cb        m_pVideoCB;
